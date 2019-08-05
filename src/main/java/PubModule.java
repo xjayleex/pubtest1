@@ -8,14 +8,10 @@ import java.util.concurrent.TimeoutException;
 
 public class PubModule {
     public static void main(String[] args)
-    throws IOException, TimeoutException {
-        System.out.println("Hello, Jaehyun !");
-        /*if(args.length == 0){
-            System.out.println("Type the Queue Name : ");
-            Scanner scanner =
-        }*/
+            throws IOException, TimeoutException {
+        System.out.println("Exhange module");
 
-        String QueueName = "tmp-queue";
+        String ExchangeName = "rmq.direct";
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setUsername("rabbitmq");
@@ -23,8 +19,10 @@ public class PubModule {
         factory.setHost("192.168.0.104"); //cn4
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
-        channel.queueDeclarePassive(QueueName);
-        String msg = "*****TEST MESSAGE*****";
+
+        channel.exchangeDeclarePassive(ExchangeName);
+
+
 
         /**** basic Property Builder *****/
         AMQP.BasicProperties.Builder builder
@@ -39,11 +37,16 @@ public class PubModule {
         builder.timestamp(date).appId("**Foo * Bar * AppIdField**").headers(headerMap);
         AMQP.BasicProperties theProps = builder.build();
 
+        String routingKey = "dcpu";
+        String msg = "*****TEST MESSAGE*****Routing key - dcpu";
 
-        channel.basicPublish("", QueueName, theProps,
-                msg.getBytes("UTF-8"));
-
+        channel.basicPublish(ExchangeName, routingKey,
+                theProps,msg.getBytes("UTF-8"));
         System.out.println(" [x] Sent ' " + msg +" '");
+
+
+
+
         channel.close();
         connection.close();
     }
